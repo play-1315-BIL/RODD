@@ -1,0 +1,45 @@
+\documentclass[12pt]{extarticle}
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{framed}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{enumerate}
+\usepackage[top=1 in,bottom=1in, left=1 in, right=1 in]{geometry}
+\usepackage{subcaption}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\title{Projet 3 -  RODD}
+\date{3 février 2021}
+\author{\textsc{BATY Léo}, \textsc{BRUNOD-INDRIGO Luca}}
+
+\begin{document}
+
+\maketitle
+
+\begin{align*}
+    \min_{x, p, t} &\sum_{i \leq M} \sum_{j \leq t(i)} p_{ij}\\
+    s.t.   & \log(t_{ij}) \geq \sum_{k \in K_{ij}^1} x_k \log\left(\frac{1}{2}\right)\\
+           & p_{ij} \geq t_{ij} - \sum_{k \in K_{ij}^2} x_k\\
+           & \sum_{k \in \mathcal{M}} x_k = P\\
+           & \sum_{k \in \mathcal{F}} x_k = P\\
+           & x_k \in \mathbb{N}\\
+           & p_{ij} \geq 0
+\end{align*}
+
+\begin{align*}
+    \min_{x, p} &\sum_{i \leq M} \sum_{j \leq t(i)} p_{ij}\\
+    s.t.   & \log(\theta_r) + \frac{1}{\theta_r}(t_{ij} - \theta_r) \sum_{k \in K_{ij}^1} x_k \log\left(\frac{1}{2}\right)\\
+           & p_{ij} \geq t_{ij} - \sum_{k \in K_{ij}^2} x_k     \\      
+           & \sum_{k \in \mathcal{M}} x_k = P\\
+           & \sum_{k \in \mathcal{F}} x_k = P\\
+           & x_k \in \mathbb{N}\\
+           & p_{ij} \geq 0
+\end{align*}
+
+\end{document}

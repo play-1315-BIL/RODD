@@ -1,0 +1,113 @@
+% custom margin sizes
+\textwidth=18cm
+\textheight=23cm
+\oddsidemargin=-1.00cm
+\evensidemargin=-1.00cm
+\parindent=1cm
+\topmargin=-2cm
+
+\usepackage{graphicx}  % adds \includegraphics command
+\usepackage{float}  % adds [H] float option in figures
+\usepackage{color}  % enable colors defining
+
+\usepackage{multicol}  % enables multicols environments
+\setlength{\columnseprule}{1pt}  % Separator ruler width
+\def\columnseprulecolor{\color{black}}  % Separator ruler colour
+
+% For "todo" notes
+\usepackage[colorinlistoftodos,textsize=scriptsize]{todonotes}
+
+\usepackage{enumitem}  % itemize/enumerate
+
+% itemize avec des bullet à la place des tirets
+\newlist{bulletlist}{itemize}{1}
+\setlist[bulletlist]{label=\textbullet}
+
+% Pour les annexes
+\usepackage{appendix}
+
+% Pour numéroter les \paragraph, afin de les utiliser comme des \subsubsubsection
+\usepackage{titlesec}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+% clickable links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+% --- Maths ---
+\usepackage{amsfonts, amsmath, amssymb, amsthm}
+% raccourci pour les intervalles entiers
+\usepackage{stmaryrd}  % for llbracket and rrbracket
+\newcommand{\llb}{\llbracket}
+\newcommand{\rrb}{\rrbracket}
+
+% write optimization problems
+\usepackage[nocomma, short]{optidef}
+
+% fonction indicatrice
+\usepackage{dsfont}
+\newcommand{\1}{\mathds{1}}
+
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\bbP}{\mathbb{P}}
+
+
+
+% --- Autres packages potentiellement utilisables ---
+% \usepackage{times}
+% \usepackage{makeidx}
+% \usepackage{amsfonts}
+% \usepackage{listings}
+% \usepackage{textcomp}
+% \usepackage{lmodern} 
+% \usepackage{makeidx}
+% \usepackage{xcolor}
+% \usepackage{tabularx}
+
+% % Pour les url
+% \usepackage{url}
+% \usepackage{hyperref}
+% \usepackage{caption} % Pour les références en utilisant ces packages
+
+% % Pour les figures contenant plusieurs images
+% \usepackage[lofdepth,lotdepth]{subfig}
+
+% % Pour les notes de bas de page
+% \usepackage[bottom]{footmisc}
+
+% % Pour le glossaire
+% %\usepackage{glossaries}
+% %\makeglossaries
+% %\newacronym{API}{API}{\textit{Application Programming Interface}} à mettre en début de document
+% %\gls{API} pour citer le mot
+
+% % Pour les headers et footers
+% \usepackage{fancyhdr}
+% \pagestyle{fancy}
+% \fancyhf{}
+% \fancyfoot[L]{\textbf{Page \thepage}}
+% \fancyhead[L]{Ecole Nationale des Ponts et Chaussées | Stage Long | 2019-2020}
+% \renewcommand{\headrulewidth}{0.4pt}
+% \renewcommand{\headheight}{16pt}
+
+% % Pour les index
+% %\usepackage{imakeidx}
+% %\makeindex[name=auteur,title={Liste des auteurs}]
+% %\makeindex[name=mot,title={Index des mots clés}]
+% %\index[auteur]{einstein} pour mettre l'auteur 'einstein' en index du mot voulu
+
+% %\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+% %\usepackage{minitoc}

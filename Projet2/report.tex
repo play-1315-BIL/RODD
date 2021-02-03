@@ -1,0 +1,36 @@
+\documentclass[12pt]{extarticle}
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{framed}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{enumerate}
+\usepackage[top=1 in,bottom=1in, left=1 in, right=1 in]{geometry}
+\usepackage{subcaption}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\title{Projet 2 -  RODD}
+\date{27 janvier 2021}
+\author{\textsc{BATY Léo}, \textsc{BRUNOD-INDRIGO Luca}}
+
+\begin{document}
+
+\maketitle
+
+\begin{align*}
+    \min_{x, y} &\frac{\sum_{i \in S} \sum_{j \neq i} d_{ij} y_{ij}}{\sum_{i \in S} x_i} &\\
+    s.t.   & \sum_{i \in S} p_i x_i \leq B\\
+           & \sum_{i \in S} a_i x_i \geq A_{min}\\
+           & \sum_{i \in S} a_i x_i \leq A_{max}\\
+           & \sum_{j \neq i} y_{ij} = x_i   & \forall i \in S\\
+           & y_{ij} \leq x_j                & \forall i \in S \; \forall j \neq i\\
+           & x_i \in \{0, 1\}   & \forall i \in S\\
+           & y_{ij} \in \{0, 1\}   & \forall i \in S \; \forall j \neq i
+\end{align*}
+
+\end{document}
