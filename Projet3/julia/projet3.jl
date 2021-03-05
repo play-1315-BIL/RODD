@@ -29,7 +29,7 @@ function generate_model(instance::Instance, theta::Array{Float64, 1})
     @constraint(model, sum(x[k] for k=1:P if is_male[k]) == P)
     @constraint(model, sum(x[k] for k=1:P if !is_male[k]) == P)
 
-    @constraint(model, [k=1:P], x[k] <= 3)
+    @constraint(model, [k=1:P], x[k] ==2)
 
     variables = Dict{String, Any}("x"=>x, "p"=>p, "q"=>q)
 
