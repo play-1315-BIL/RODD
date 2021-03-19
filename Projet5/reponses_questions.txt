@@ -1,0 +1,25 @@
+Question pourrie : 
+
+Pour un pas de temps donné, la contrainte d'émissions impose d'utiliser au moins une source écologique pour que la valeur du membre de droite puisse rester négative.
+Pour maximiser l'objectif, l'utilisation d'une autre source moins écologique mais plus rentable jusqu'à saturer la contrainte paraît naturelle. L'équilibrage entre les deux sources dépend alors de leurs coûts et valeurs d'émissions respectifs.
+
+2.2
+
+On aurait pu s'attendre à ce que les tendances des courbes de valeurs objectif et d'émissions aient des tendances claires, à savoir, croissante pour les émissions et décroissante pour l'objectif puisqu'intuitivement l'élargissement de la fenêtre assouplit les contraintes sur les émissions.\\
+Ce que nous pouvons observer dans nos résultats est assez éloigné de ces attentes. 
+La courbe des valeurs objectif semble globalement décroître et celle des émissions croître mais elle ne sont pas du tout monotones.
+Les courbes présentent des pics d'apparence quasi périodique qui nous semblent pouvoir être attribués à des effets de bord (la fenêtre coulissante étant bloquée par le début et la fin de la période).
+
+2.3
+
+Comme on pouvait l'anticiper, l'augmentation de la limite carbone d'une unité provoque globalement une augmentation des valeurs des émissions et une diminution des valeurs de l'objectif. Avec une limite plus haute, il est en effet possible d'avoir davantage recours aux sources plus rentables et moins écologiques, ce qui se traduit par les effets que nous venons d'énoncer.
+
+2.4
+
+Nous avons testé l'influence du nombre de modes en ajoutant une cinquième source coûteuse mais sans émissions.
+La courbe des émissions obtenue suite à cet ajout présente des pics plus marqués mais semble garder la tendance globalement croissante déjà observée.
+La courbe des valeurs objectif reste elle aussi globalement décroissante.
+
+En augmentant cette fois la taille de l'horizon (en passant de 12 à 24) on obtient des courbes avec les mêmes tendances que celles observées précédemment.
+Il nous semble observer que l'amplitude des pics périodiques est moins importante, ce qui pourrait aller dans le sens de l'hypothèse des effets de bord que nous avons formulée plus haut.
+

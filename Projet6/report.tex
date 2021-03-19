@@ -1,0 +1,35 @@
+\documentclass[12pt]{extarticle}
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{framed}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{enumerate}
+\usepackage[top=1 in,bottom=1in, left=1 in, right=1 in]{geometry}
+\usepackage{subcaption}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\title{Projet 1 -  RODD}
+\date{20 janvier 2021}
+\author{\textsc{BATY Léo}, \textsc{BRUNOD-INDRIGO Luca}}
+
+\begin{document}
+
+\maketitle
+
+\begin{align*}
+    \min_{x, y} &\sum_{i \in N} a_i x_i &\\
+    s.t.   & \sum_{i \in S_k} x_i \log(1 - p_{ki}) \geq \log(1 - \alpha_k) & \forall k \in C\\
+           & \sum_{i \in S_k} y_i \log(1 - p_{ki}) \geq \log(1 - \alpha_k) & \forall k \in D\\
+           & x_i \geq y_i       & \forall i \in N\\
+           & x_j \geq y_i       & \forall i \in N \; \forall j \in \delta(i)\\
+           & x_i \in \{0, 1\}   & \forall i \in N\\
+           & y_i \in \{0, 1\}   & \forall i \in N
+\end{align*}
+
+\end{document}
