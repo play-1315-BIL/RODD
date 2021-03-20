@@ -13,6 +13,8 @@
 \usepackage[top=1 in,bottom=1in, left=1 in, right=1 in]{geometry}
 \usepackage{subcaption}
 \usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{packages}
+\usepackage{multirow}
 
 \title{Projet 3 -  RODD}
 \date{3 février 2021}
@@ -21,6 +23,36 @@
 \begin{document}
 
 \maketitle
+
+\section{Premier modèle}
+
+Notons $\mathcal{F}$ (resp. $\mathcal{M}$) l'ensemble des individus femelles (resp. mâles) et $\mathcal{K}^1_{ij}$ (resp. $\mathcal{K}^2_{ij}$) l'ensemble des individus ayant un (resp. deux) exemplaire(s) de l'allèle $j$ du gène $i$.\\
+On considère également les variables entières $(x_k)_{k=1 \dots p}$ donnant le nombre de progénitures de l'individu $k$.
+
+\bigskip
+
+L'espérance du nombre d'allèles disparus s'écrit : 
+
+\begin{align*}
+    \mathbb{E}(N^{disparus})    &= \sum_{i \leq M} \sum_{j \leq t(i)} \mathbb{E}(\1_{ij \; \text{disparait}}) \\
+                                &= \sum_{i \leq M} \sum_{j \leq t(i)} \mathbb{P}(ij \; \text{disparait})
+\end{align*}
+
+Or, on remarque que : 
+$$
+\mathbb{P}(ij \; \text{disparait}) = \left\{
+    \begin{array}{ll}
+        0 & \mbox{si } \exists k \in \mathcal{K}^2_{ij} \; \mbox{tel que} \;  x_k > 0 \\
+        \left(\frac{1}{2}\right)^{\sum_{k \in K_{ij}^1} x_k} & \mbox{sinon.}
+    \end{array}
+\right.
+$$
+
+Ce qui, les $x_k$ étant entiers, se réécrit : 
+
+$$\mathbb{P}(ij \; \text{disparait}) = \max(0, \left(\frac{1}{2}\right)^{\sum_{k \in K_{ij}^1} x_k} - \sum_{k \in K_{ij}^2} x_k)$$
+
+On en déduit le modèle suivant : 
 
 \begin{align*}
     \min_{x, p, t} &\sum_{i \leq M} \sum_{j \leq t(i)} p_{ij}\\
@@ -32,14 +64,143 @@
            & p_{ij} \geq 0
 \end{align*}
 
+\section{Approximation linéaire}
+
+En approchant la fonction logarithme par une fonction affine par morceaux comme indiqué dans le sujet, on obtient le modèle suivant :
+
 \begin{align*}
     \min_{x, p} &\sum_{i \leq M} \sum_{j \leq t(i)} p_{ij}\\
-    s.t.   & \log(\theta_r) + \frac{1}{\theta_r}(t_{ij} - \theta_r) \sum_{k \in K_{ij}^1} x_k \log\left(\frac{1}{2}\right)\\
+    s.t.   & \log(\theta_r) + \frac{1}{\theta_r}(t_{ij} - \theta_r) \geq \sum_{k \in K_{ij}^1} x_k \log\left(\frac{1}{2}\right)\\
            & p_{ij} \geq t_{ij} - \sum_{k \in K_{ij}^2} x_k     \\      
            & \sum_{k \in \mathcal{M}} x_k = P\\
            & \sum_{k \in \mathcal{F}} x_k = P\\
            & x_k \in \mathbb{N}\\
            & p_{ij} \geq 0
 \end{align*}
+
+Ce modèle fournit bien une solution admissible au problème, étant donné que le vecteur $x_k$ vérifie toujours les contraintes d'intégrité et de conservation de la taille de la population.\\
+De plus, puisqu'il s'agit d'une approximation par excès du logarithme, les contraintes $\log(\theta_r) + \frac{1}{\theta_r}(t_{ij} - \theta_r) \geq \sum_{k \in K_{ij}^1} x_k \log\left(\frac{1}{2}\right)$ à $x_{k}$ fixés conduisent à des valeurs de $t_{ij}$ plus faibles que la contrainte $\log(t_{ij}) \geq \sum_{k \in K_{ij}^1} x_k \log\left(\frac{1}{2}\right)$, donc également des valeurs plus faibles des $p_{ij}$ et de l'objectif.\\
+Une solution optimale de ce modèle est donc bien une borne inférieure.
+
+\section{Calculs sur les instances de l'énoncé}
+
+Le tableau \ref{tab:table-1} montre les résultats obtenus sur les instances de l'énoncé en prenant $\theta_1 = 0.0001$ et $h = 50$.
+
+\begin{table}[h!]
+    \scriptsize
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \multirow{2}{*}{\textbf{Instance}} & \multirow{2}{*}{\textbf{Temps}} & \multirow{2}{*}{\textbf{Nombre de noeuds}} & \multirow{2}{*}{\textbf{Espérance}} & \multicolumn{10}{|c|}{\textbf{Probabilités de disparition}} & \textbf{Borne inférieure} \\
+        & & & & \textbf{A} & \textbf{a} & \textbf{B} & \textbf{b} & \textbf{C} & \textbf{c} & \textbf{D} & \textbf{d} & \textbf{E} & \textbf{e} & \\
+        \hline
+        \textbf{$x_k \leq 2$} & 0.00 & 0 & 0.0625 & 0 & 0 & 0 & 0.0625 & 0 & 0 & 0 & 0 & 0 & 0 & 0.06243336502896749 \\
+        \hline
+        \textbf{$x_k \leq 3$} & 0.15 & 0 & 0.015625 & 0 & 0 & 0 & 0.015625 & 0 & 0 & 0 & 0 & 0 & 0 & 0.015620569018547845 \\
+        \hline
+    \end{tabular}
+    \caption{Résultats sur les instances de l'énoncé}
+    \label{tab:table-1}
+\end{table}
+
+\section{Essais sur des instances aléatoires}
+
+Le tableau \ref{tab:table-2} donne les résultats obtenus en appliquent le programme à des instances de tailles différentes en conservant les paramètres $\theta_1 = 0.0001$ et $h = 50$.
+
+\begin{table}[h!]
+    \scriptsize
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \textbf{Taille de population} & \textbf{Nombre de gènes} &\textbf{Temps} & \textbf{Nombre de noeuds} & \textbf{Espérance} &  \textbf{Borne inférieure} \\
+        \hline
+        10 & 6 & 0.03 & 0 & 3.814697265625e-6 & 0.0 \\
+        \hline
+        12 & 8 & 0.02 & 0 & 0 & 0.0 \\
+        \hline
+        16 & 10 & 0.03 & 0 & 6.103562191128731e-5 & 0.0 \\
+        \hline
+        20 & 16 & 0.01 & 0 & 6.198883056640625e-6 & 0.0 \\
+        \hline
+        30 & 19 & 0.02 & 0 & 5.122274165589302e-9 & 0.0 \\
+        \hline
+        40 & 25 & 0.04 & 0 & 5.911715561532305e-12 & 0.0 \\
+        \hline
+        50 & 31 & 0.06 & 0 & 7.549516567451072e-15 & 0.0 \\
+        \hline
+        60 & 38 & 0.09 & 0 & 4.662069341687669e-18 & 0.0 \\
+        \hline
+        80 & 50 & 0.19 & 0 & 9.155273437500011e-5 & 0.0 \\
+        \hline
+        100 & 62 & 0.27 & 0 & 6.103515625e-5 & 0.0 \\
+        \hline
+        160 & 100 & 0.80 & 0 & 0.00010681338608264923 & 0.0 \\
+        \hline
+        200 & 125 & 0.97 & 0 & 0.00018310640007257462 & 0.0 \\
+        \hline
+        300 & 188 & 2.84 & 0 & 7.629767065964188e-5 & 0.0 \\
+        \hline
+        400 & 250 & 17.49 & 0 & 6.104307252030594e-5 & 0.0 \\
+        \hline
+        500 & 312 & 14.50 & 0 & 0.00011062668636441231 & 0.0 \\
+    \end{tabular}
+    \caption{Résultats sur des instances aléatoires de tailles différentes}
+    \label{tab:table-2}
+\end{table}
+
+On peut constater que, malgré l'augmentation de taille, CPLEX réussit toujours à résoudre le problème à la racine.
+Par ailleurs, et comme cela pouvait être attendu, l'écart entre la borne inférieure et l'espérance calculée à partir de la solution obtenue semble augmenter.
+Nous pensons que cela est dû au fait que le manque de précision dans l'approximation du logarithme a davantage d'impact quand la taille de l'instance augmente.
+
+\begin{table}[h!]
+    \scriptsize
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \textbf{$h$} &\textbf{Temps} & \textbf{Nombre de noeuds} & \textbf{Espérance} &  \textbf{Borne inférieure} \\
+        \hline
+        50 & 1.1836340427398682 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        60 & 1.3889548778533936 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        70 & 1.713580846786499 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        80 & 1.942518949508667 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        90 & 2.1335439682006836 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        100 & 2.448179006576538 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        110 & 2.729564905166626 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        120 & 3.1832730770111084 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        130 & 3.364945888519287 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        140 & 3.5438148975372314 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        150 & 3.849707841873169 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        160 & 4.177340030670166 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        170 & 4.513378143310547 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+        180 & 5.585042953491211 & 0 & 6.866548210382462e-5 & 0.0\\
+        \hline
+        190 & 6.031890153884888 & 0 & 6.866548210382462e-5 & 0.0\\
+        \hline
+        200 & 5.396224021911621 & 0 & 0.0001068115234375 & 0.0\\
+        \hline
+    \end{tabular}
+    \caption{Résultats sur une instance aléatoire pour différentes valeurs de $h$}
+    \label{tab:table-3}
+\end{table}
+
+Le tableau \ref{tab:table-3} montre les résultats obtenus en appliquant le programme à une même instance aléatoire pour différentes valeurs de $h$.
+On remarque naturellement que l'augmentation de $h$ augmente le temps de calcul puisqu'il y a davantage de contraintes.
+Cependant, alors qu'on aurait pu s'attendre à ce que l'espérance obtenue augmente du fait de la meilleure qualité de l'approximation du logarithme, on observe seulement deux valeurs différentes qui ne permettent pas de définir une tendance.
+Cela est pourrait être dû à une spécificité de l'instance aléatoire utilisée.
+
+
 
 \end{document}

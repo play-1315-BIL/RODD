@@ -44,9 +44,32 @@ function solve_natural_reserve_model!(model::Model, variables::Dict{String, Any}
     end
 end
 
+function compute_survival_probability(instance::Instance, x, y)
+    N = Int64(size(instance.parcel_graph)[1])
+    K = Int64(size(instance.survival_probability)[1])
+
+    survival_probabilities = Array{Float64, 1}(zeros(K))
+    for k = 1:K
+        extinction_probability = 1
+        if instance.is_in_danger[k]
+            extinction_probability = exp(sum(y[i]*log(1 - instance.survival_probability[k, i]) for i=1:N))
+        else
+            extinction_probability = exp(sum(x[i]*log(1 - instance.survival_probability[k, i]) for i=1:N))
+        end
+        survival_probabilities[k] = 1 - extinction_probability
+    end
+
+    return survival_probabilities
+end
+
 
 function natural_reserve_model(required_survival_probability::Array{Float64, 1})
-    instance = create_instance(required_survival_probability)
+    #instance = create_instance(required_survival_probability)
+    
+    number_species = 40
+    grid_size = Int64(round(sqrt(number_species/6*100)))
+    
+    instance = random_instance(grid_size, number_species)
 
     model, variables = generate_natural_reserve_model(instance)
 
@@ -56,13 +79,15 @@ function natural_reserve_model(required_survival_probability::Array{Float64, 1})
     println("objective value: ", objective)
     println("x: ", x)
     println("y: ", y)
+    println("node count: ", node_count(model))
+
+    println("grid_size", grid_size)
+
+    #survival_probabilities = compute_survival_probability(instance, x, y)
+    #println("survival_probabilities", survival_probabilities)
 end
 
-required_survival_probability = Array{Float64, 1}([0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
+required_survival_probability = Array{Float64, 1}([0.9, 0.9, 0.9, 0.5, 0.5, 0.5])
 
 natural_reserve_model(required_survival_probability)
-
-
-
-
 

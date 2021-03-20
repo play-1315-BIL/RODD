@@ -34,3 +34,18 @@ function create_instance()
 
     return Instance(nb_autres_alleles, is_male)
 end
+
+function random_instance(number_males::Int64, number_genes::Int64)
+    is_male = Array{Bool, 1}(vcat(ones(number_males), zeros(number_males)))
+
+    nb_autres_alleles = []
+    for k=1:(2*number_males)
+        for i=1:number_genes
+            random_integer = Int64(abs(rand(Int))%3)
+            push!(nb_autres_alleles, [random_integer, 2-random_integer])
+        end
+    end
+    nb_autres_alleles = Array{Array{Int64, 1}, 2}(permutedims(reshape(nb_autres_alleles, (number_genes, 2*number_males))))
+
+    return Instance(nb_autres_alleles, is_male)
+end

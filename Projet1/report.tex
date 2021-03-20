@@ -13,6 +13,7 @@
 \usepackage[top=1 in,bottom=1in, left=1 in, right=1 in]{geometry}
 \usepackage{subcaption}
 \usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{packages}
 
 \title{Projet 1 -  RODD}
 \date{20 janvier 2021}
@@ -22,14 +23,103 @@
 
 \maketitle
 
+\section{Modélisation}
+
+On propose le modèle suivant : 
+
 \begin{align*}
     \min_{x, y} &\sum_{i \in N} a_i x_i &\\
-    s.t.   & \sum_{i \in S_k} x_i \log(1 - p_{ki}) \geq \log(1 - \alpha_k) & \forall k \in C\\
-           & \sum_{i \in S_k} y_i \log(1 - p_{ki}) \geq \log(1 - \alpha_k) & \forall k \in D\\
+    s.t.   & \sum_{i \in S_k} x_i \log(1 - p_{ki}) \leq \log(1 - \alpha_k) & \forall k \in C\\
+           & \sum_{i \in S_k} y_i \log(1 - p_{ki}) \leq \log(1 - \alpha_k) & \forall k \in D\\
            & x_i \geq y_i       & \forall i \in N\\
            & x_j \geq y_i       & \forall i \in N \; \forall j \in \delta(i)\\
            & x_i \in \{0, 1\}   & \forall i \in N\\
            & y_i \in \{0, 1\}   & \forall i \in N
 \end{align*}
+
+\bigskip
+
+Les variables $x_{i}$ valent $1$ si et seulement si la parcelle $i$ est protégée.
+Les variables $y_{i}$ valent $1$ si et seulement si la parcelle est une zone centrale.
+L'ensemble $C$ (resp. $D$) désigne l'ensemble des espèces communes (resp. en danger).
+La notation $\delta(i)$ désigne les voisins de la parcelle $i$, soit les huit cases adjacentes dans le cas présent.
+
+\section{Résolution des instances fournies}
+
+Le tableau \ref{tab:table-1} montre les résultats obtenus en appliquant notre programme aux instances proposées par l'énoncé.
+On constate qu'ils coïncident bien avec les solutions fournies.
+
+\begin{table}[h!]
+    \scriptsize
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Instance} & \textbf{Temps} & \textbf{Nombre de noeuds} & \textbf{Coût} & \textbf{$p_1$} & \textbf{$p_2$} & \textbf{$p_3$} & \textbf{$p_4$} & \textbf{$p_5$} & \textbf{$p_6$} \\
+        \hline
+        \textbf{$\alpha = 0.5$} & 0.14 & 0 & 119 & 0.58 & 0.52 & 0.64 & 0.917056 & 0.64 & 0.755 \\
+        \hline
+        \textbf{$\alpha_D = 0.9 \; \alpha_C = 0.5$} & 0.01 & 0 & 327 & 0.915328 & 0.90784 & 0.91936 & 0.9804915712 & 0.892 & 0.981478 \\
+        \hline
+        \textbf{$\alpha_D = 0.5 \; \alpha_C = 0.9$} & 0.12 & 0 & 130 & 0.58 & 0.52 & 0.64 & 0.9336448 & 0.91 & 0.9118 \\
+        \hline
+        \textbf{$\alpha_D = 0.8 \; \alpha_C = 0.6$} & 0.02 & 0 & 211 & 0.8236 & 0.808 & 0.82 & 0.972130816 & 0.784 & 0.8775 \\
+        \hline
+    \end{tabular}
+    \caption{Résultats obtenus sur les instances de l'énoncé}
+    \label{tab:table-1}
+\end{table}
+
+\section{Comportement du programme linéaire en fonction de la taille de l'instance}
+
+\begin{table}[h!]
+    \scriptsize
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Nombre d'espèces} & \textbf{Taille de la grille} & \textbf{Temps de calcul} & \textbf{Nombre de noeuds} \\
+        \hline
+        10 & 13 & 0.18 & 0 \\
+        \hline
+        15 & 16 & 0.61 & 0 \\
+        \hline
+        20 & 18 & 0.66 & 0 \\
+        \hline
+        25 & 20 & 3.97 & 1084 \\
+        \hline
+        30 & 22 & 3.98 & 285 \\
+        \hline
+        40 & 26 & 274.77 & 21369 \\
+    \end{tabular}
+    \caption{Performances du programme linéaire sur des instances aléatoires}
+    \label{tab:table-2}
+\end{table}
+
+Le tableau \ref{tab:table-2} indique les temps de calcul et nombre de noeuds explorés pour la résolution d'instances générées aléatoirement.
+On peut observer que l'un comme l'autre explosent assez rapidement lorsque la taille de l'instance augmente.
+
+\section{Modèle avec contrainte budgétaire}
+
+Commençons par remarquer que l'espérance du nombre d'espèces survivantes peut se réécrire comme suit : 
+
+\begin{align*}
+    \mathbb{E}(N^{survivantes}) &= \sum_{k \in K} \mathbb{E}(\1_{i \; \text{survit}}) \\
+                                &= \sum_{k \in K} \mathbb{P}(i \; \text{survit})\\
+                                &= \sum_{k \in K} (1 - \mathbb{P}(i \; \text{ne survit pas}))\\
+                                &= \sum_{k \in D} (1 - \prod_{i \in N}(1 - p_{ik})^{y_i}) + \sum_{k \in C} (1 - \prod_{i \in N}(1 - p_{ik})^{x_i})\\
+\end{align*}
+
+D'où le modèle suivant dans lequel on note $B$ le budget :
+
+\begin{align*}
+    \min_{x, y} &\sum_{k \in D} (1 - \prod_{i \in N}(1 - p_{ik})^{y_i}) + \sum_{k \in C} (1 - \prod_{i \in N}(1 - p_{ik})^{x_i})&\\
+    s.t.   & \sum_{i \in N} a_i x_i \leq B & \\
+           & x_i \geq y_i       & \forall i \in N\\
+           & x_j \geq y_i       & \forall i \in N \; \forall j \in \delta(i)\\
+           & x_i \in \{0, 1\}   & \forall i \in N\\
+           & y_i \in \{0, 1\}   & \forall i \in N
+\end{align*}
+
+Le problème qui se présente ici pour la linéarisation est que le passage au logarithme pour déplacer les variables d'exposant en facteur, qui était possible lorsqu'on avait un produit, ne fonctionne plus avec une somme de produits.
+Une solution pour contourner ce problème peut être d'avoir recours à une approximation du logarithme par ses tangentes tel que le propose le projet 3.
 
 \end{document}

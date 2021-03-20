@@ -42,7 +42,7 @@ function generate_grid_graph(protection_cost::Array{Int64, 2}, given_survival_pr
                 end
             end
             if i == 1 || i == width || j == 1 || j == height
-                is_edge[(i-1)*height + j] == true
+                is_edge[(i-1)*height + j] = true
             end
 
             new_protection_cost[(i-1)*height + j] = protection_cost[i, j]
@@ -151,6 +151,43 @@ function create_instance(required_survival_probability::Array{Float64, 1})
     ])
 
     parcel_graph, protection_cost, survival_probability, is_edge = generate_grid_graph(grid_protection_cost, given_survival_probability, number_species)
+
+    return Instance(parcel_graph, is_in_danger, survival_probability, protection_cost, required_survival_probability, is_edge)
+end
+
+function random_instance(grid_size::Int64, number_species::Int64)
+
+    minimum_extinction_probabilities = Array{Float64, 1}(ones(number_species))
+
+    grid_protection_cost = Array{Int64, 2}(zeros(grid_size, grid_size))
+    given_survival_probabilities = Array{Float64, 2}(zeros((0, 4)))
+
+    is_in_danger = Array{Bool, 1}(rand(Bool, number_species))
+
+    for i = 1:grid_size
+        for j = 1:grid_size
+            grid_protection_cost[i, j] = abs(rand(Int))%10
+
+            for k = 1:number_species
+                if rand() < 0.15
+                    p = rand()
+                    line = Array{Float64, 2}([k i j p])
+                    given_survival_probabilities = vcat(given_survival_probabilities, line)
+
+                    if !(is_in_danger[k] && (i == 1 || i == grid_size || j == 1 || j == grid_size))
+                        minimum_extinction_probabilities[k] = minimum_extinction_probabilities[k] * (1 -p)
+                    end
+                end
+            end
+        end
+    end
+
+    required_survival_probability = Array{Float64, 1}(zeros(number_species))
+    for k = 1:number_species
+        required_survival_probability[k] = rand() * (1 - minimum_extinction_probabilities[k])
+    end
+
+    parcel_graph, protection_cost, survival_probability, is_edge = generate_grid_graph(grid_protection_cost, given_survival_probabilities, number_species)
 
     return Instance(parcel_graph, is_in_danger, survival_probability, protection_cost, required_survival_probability, is_edge)
 end
