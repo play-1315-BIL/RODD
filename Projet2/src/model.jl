@@ -1,8 +1,6 @@
-using JuMP, CPLEX
-
-
 function generate_base_subproblem(instance::Instance)
     model = Model(CPLEX.Optimizer)
+    # set_silent(model)
 
     N = instance.nb_parcels
     d = instance.distances
@@ -19,6 +17,7 @@ function generate_base_subproblem(instance::Instance)
     @constraint(model, sum(a[i] * x[i] for i=1:N) <= Amax)
     @constraint(model, sum(a[i] * x[i] for i=1:N) >= Amin)
     @constraint(model, sum(c[i] * x[i] for i=1:N) <= B)
+
     @constraint(model, [i=1:N, j=1:N; j != i], y[i, j] <= x[j])
     @constraint(model, [i=1:N], sum(y[i, j] for j=1:N if j != i) == x[i])
 
@@ -51,12 +50,11 @@ end
 function dinkelbach(instance::Instance)
     d = instance.distances
     N = instance.nb_parcels
-    epsilon = 1e-20
+    epsilon = 1e-15
 
-    lambda = Float64(0)
+    lambda::Float64 = 1
     subproblem, variables = generate_base_subproblem(instance)
     v_lambda = 1
-
 
     counter = 1
     while true

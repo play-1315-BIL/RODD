@@ -1,18 +1,24 @@
-\documentclass[12pt]{extarticle}
-\usepackage[francais]{babel}
+\documentclass[12pt]{article}
+
+% essential packages
 \usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
 \usepackage[T1]{fontenc}
-\usepackage{graphicx}
-\usepackage{framed}
-\usepackage[normalem]{ulem}
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{amssymb}
-\usepackage{amsfonts}
-\usepackage{enumerate}
-\usepackage[top=1 in,bottom=1in, left=1 in, right=1 in]{geometry}
-\usepackage{subcaption}
-\usepackage[usenames,dvipsnames]{xcolor}
+
+% other packages
+\usepackage{packages}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, arrows.meta, calc, external, automata}
+\tikzexternalize
+\tikzexternaldisable
+\makeatletter
+\makeatother
+\tikzstyle{cercle} = [circle, minimum height=1.4cm, text centered, draw=black, fill=forestgreen!50]
+\tikzstyle{arrow} = [thick, ->, >=stealth, line width = .7mm, color=black!80]
+\tikzstyle{fractional-arrow} = [thick, ->, >=stealth, line width = .1mm, double, double distance=0.5mm]
+
+\definecolor{forestgreen}{rgb}{0.0, 0.27, 0.13}
 
 \title{Projet 2 -  RODD}
 \date{27 janvier 2021}
@@ -22,15 +28,202 @@
 
 \maketitle
 
-\begin{align*}
-    \min_{x, y} &\frac{\sum_{i \in S} \sum_{j \neq i} d_{ij} y_{ij}}{\sum_{i \in S} x_i} &\\
-    s.t.   & \sum_{i \in S} p_i x_i \leq B\\
-           & \sum_{i \in S} a_i x_i \geq A_{min}\\
-           & \sum_{i \in S} a_i x_i \leq A_{max}\\
-           & \sum_{j \neq i} y_{ij} = x_i   & \forall i \in S\\
-           & y_{ij} \leq x_j                & \forall i \in S \; \forall j \neq i\\
-           & x_i \in \{0, 1\}   & \forall i \in S\\
-           & y_{ij} \in \{0, 1\}   & \forall i \in S \; \forall j \neq i
-\end{align*}
+\section{Modélisation du problème}
+
+\begin{arrowlist}
+    \item \textbf{Données} :
+    \begin{bulletlist}
+        \item $d_{ij}$ : distance entre la parcelle $i$ et la parcelle $j$
+        \item $p_i$ : coût de sélection de la parcelle $i$
+        \item $a_i$ : aire de la parcelle $i$
+        \item $A_{min}$ : aire minimum de parcelles à sélectionner
+        \item $A_{max}$ : aire maximum de parcelles à sélectionner
+        \item $B$ : budget maximum
+    \end{bulletlist}
+    \item \textbf{Variables de décision} :
+    \begin{bulletlist}
+        \item $x_i = \1_{\{ \text{la parcelle $i$ est sélectionnée} \}}$
+        \item $y_{ij} = \1_{\{\text{la parcelle $i$ et selectionnée, et la parcelle $j$ est la plus proche parcelle sélectionnée de la parcelle $i$} \}}$
+    \end{bulletlist}
+    \item Programme d’optimisation combinatoire fractionnaire linéaire associé :
+    \begin{align*}
+        \min_{x, y} &\quad\frac{\sum_{i \in S} \sum_{j \neq i} d_{ij} y_{ij}}{\sum_{i \in S} x_i} &\\
+        s.t.   &\quad \sum_{i \in S} p_i x_i \leq B\\
+               &\quad \sum_{i \in S} a_i x_i \geq A_{min}\\
+               &\quad \sum_{i \in S} a_i x_i \leq A_{max}\\
+               &\quad \sum_{j \neq i} y_{ij} = x_i   & \forall i \in S\\
+               &\quad y_{ij} \leq x_j                & \forall i \in S \; \forall j \neq i\\
+               &\quad x_i \in \{0, 1\}   & \forall i \in S\\
+               &\quad y_{ij} \in \{0, 1\}   & \forall i \in S \; \forall j \neq i
+    \end{align*}
+\end{arrowlist}
+
+\section{Implémentation et résultats}
+
+\noindent Afin de résoudre le programme d'optimisation combinatoire fractionnaire linéaire, nous avons implémenté l'algorithme de Dinkelbach présenté dans l'énoncé en Julia.
+
+\medskip
+
+\noindent Voici les résulats obtenus pour les 3 instances de l'énoncé, en utilisant CPLEX pour résoudre les PLNE :
+
+\begin{arrowlist}
+    \item $A_{min} = 30, A_{max} = 35, B = 920$ :
+    \begin{bulletlist}
+        \item temps de calcul : $0.449146576$ s
+        \item noeuds développés dans l'arbre de recherche : 0
+        \item nombre d'itérations de l'algorithme : 1
+        \item valeur de la solution : $1.1550093846624292$
+        \item parcelles retenues : 35
+        \begin{center}
+            \begin{tikzpicture}[scale=0.5, every node/.style={transform shape}]
+                \tikzstyle{box} = [rectangle,draw=black,thick, minimum size=1cm]
+            
+                \foreach \x in {1,...,10}{
+                    \foreach \y in {1,...,10}
+                        \node[box] at (\x,\y){};
+                }
+                
+                \node[box, fill=forestgreen!50] at (2,10){};
+                \node[box, fill=forestgreen!50] at (5,10){};
+                \node[box, fill=forestgreen!50] at (8,10){};
+                \node[box, fill=forestgreen!50] at (5,9){};
+                \node[box, fill=forestgreen!50] at (8,9){};
+                \node[box, fill=forestgreen!50] at (2,8){};
+                \node[box, fill=forestgreen!50] at (3,8){};
+                \node[box, fill=forestgreen!50] at (5,8){};
+                \node[box, fill=forestgreen!50] at (6,8){};
+                \node[box, fill=forestgreen!50] at (7,8){};
+                \node[box, fill=forestgreen!50] at (2,7){};
+                \node[box, fill=forestgreen!50] at (5,7){};
+                \node[box, fill=forestgreen!50] at (1,6){};
+                \node[box, fill=forestgreen!50] at (2,6){};
+                \node[box, fill=forestgreen!50] at (3,6){};
+                \node[box, fill=forestgreen!50] at (4,6){};
+                \node[box, fill=forestgreen!50] at (7,6){};
+                \node[box, fill=forestgreen!50] at (10,6){};
+                \node[box, fill=forestgreen!50] at (3,5){};
+                \node[box, fill=forestgreen!50] at (2,4){};
+                \node[box, fill=forestgreen!50] at (3,4){};
+                \node[box, fill=forestgreen!50] at (10,4){};
+                \node[box, fill=forestgreen!50] at (2,3){};
+                \node[box, fill=forestgreen!50] at (4,3){};
+                \node[box, fill=forestgreen!50] at (5,3){};
+                \node[box, fill=forestgreen!50] at (9,3){};
+                \node[box, fill=forestgreen!50] at (10,3){};
+                \node[box, fill=forestgreen!50] at (4,2){};
+                \node[box, fill=forestgreen!50] at (5,1){};
+                \node[box, fill=forestgreen!50] at (8,1){};
+            
+            \end{tikzpicture}
+        \end{center}
+    \end{bulletlist}
+    \item $A_{min} = 20, A_{max} = 21, B = 520$ :
+    \begin{bulletlist}
+        \item temps de calcul : $0.318542181$ s
+        \item noeuds développés dans l'arbre de recherche : 0
+        \item nombre d'itérations de l'algorithme : 1
+        \item valeur de la solution : $1.2739354332309538$
+        \item parcelles retenues : 20
+        \begin{center}
+            \begin{tikzpicture}[scale=0.5, every node/.style={transform shape}]
+                \tikzstyle{box} = [rectangle,draw=black,thick, minimum size=1cm]
+            
+                \foreach \x in {1,...,10}{
+                    \foreach \y in {1,...,10}
+                        \node[box] at (\x,\y){};
+                }
+                
+                \node[box, fill=forestgreen!50] at (2,10){};
+                \node[box, fill=forestgreen!50] at (5,10){};
+                \node[box, fill=forestgreen!50] at (8,10){};
+
+                \node[box, fill=forestgreen!50] at (5,9){};
+                \node[box, fill=forestgreen!50] at (8,9){};
+
+                \node[box, fill=forestgreen!50] at (2,8){};
+                \node[box, fill=forestgreen!50] at (5,8){};
+                \node[box, fill=forestgreen!50] at (6,8){};
+
+                \node[box, fill=forestgreen!50] at (2,7){};
+
+                \node[box, fill=forestgreen!50] at (1,6){};
+                \node[box, fill=forestgreen!50] at (3,6){};
+
+                \node[box, fill=forestgreen!50] at (3,5){};
+
+                \node[box, fill=forestgreen!50] at (2,4){};
+                \node[box, fill=forestgreen!50] at (3,4){};
+                \node[box, fill=forestgreen!50] at (10,4){};
+
+                \node[box, fill=forestgreen!50] at (2,3){};
+                \node[box, fill=forestgreen!50] at (5,3){};
+                \node[box, fill=forestgreen!50] at (9,3){};
+
+                \node[box, fill=forestgreen!50] at (5,1){};
+                \node[box, fill=forestgreen!50] at (8,1){};
+            
+            \end{tikzpicture}
+        \end{center}
+    \end{bulletlist}
+    \item $A_{min} = 70, A_{max} = 75, B = 3500$ :
+    \begin{bulletlist}
+        \item temps de calcul : $1.17581296$ s
+        \item noeuds développés dans l'arbre de recherche : 0
+        \item nombre d'itérations de l'algorithme : 1
+        \item valeur de la solution : $1$
+        \item parcelles retenues : 70
+        \begin{center}
+            \begin{tikzpicture}[scale=0.5, every node/.style={transform shape}]
+                \tikzstyle{box} = [rectangle,draw=black,thick, minimum size=1cm]
+            
+                \foreach \x in {1,...,10}{
+                    \foreach \y in {1,...,10}
+                        \node[box, fill=forestgreen!50] at (\x,\y){};
+                }
+                
+                \node[box, fill=white] at (3,10){};
+                \node[box, fill=white] at (4,10){};
+
+                \node[box, fill=white] at (3,9){};
+                \node[box, fill=white] at (6,9){};
+                \node[box, fill=white] at (9,9){};
+                \node[box, fill=white] at (10,9){};
+
+                \node[box, fill=white] at (8,8){};
+                \node[box, fill=white] at (9,8){};
+
+                \node[box, fill=white] at (2,7){};
+                \node[box, fill=white] at (8,7){};
+                \node[box, fill=white] at (9,7){};
+
+                \node[box, fill=white] at (5,6){};
+                \node[box, fill=white] at (8,6){};
+                \node[box, fill=white] at (9,6){};
+
+                \node[box, fill=white] at (4,5){};
+                \node[box, fill=white] at (5,5){};
+                \node[box, fill=white] at (6,5){};
+                \node[box, fill=white] at (9,5){};
+                \node[box, fill=white] at (10,5){};
+
+                \node[box, fill=white] at (5,4){};
+                \node[box, fill=white] at (6,4){};
+                \node[box, fill=white] at (8,4){};
+
+                \node[box, fill=white] at (3,3){};
+                \node[box, fill=white] at (8,3){};
+
+                \node[box, fill=white] at (1,2){};
+                \node[box, fill=white] at (7,2){};
+
+                \node[box, fill=white] at (1,1){};
+                \node[box, fill=white] at (7,1){};
+                \node[box, fill=white] at (9,1){};
+                \node[box, fill=white] at (10,1){};
+            
+            \end{tikzpicture}
+        \end{center}
+    \end{bulletlist}
+\end{arrowlist}
 
 \end{document}

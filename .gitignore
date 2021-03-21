@@ -1,1 +1,9 @@
 *Manifest.toml
+*.DS_Store
+*.aux
+*.auxlock
+*.fdb_latexmk
+*.fls
+*.out
+*.gz
+*.log
