@@ -1,0 +1,40 @@
+\documentclass[12pt]{article}
+
+% essential packages
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+
+% other packages
+\usepackage{packages}
+
+\title{TP RODD}
+\date{\today}
+\author{\textsc{BRUNOD-INDRIGO Luca}, \textsc{BATY Léo}}
+
+\begin{document}
+
+\maketitle
+
+
+$G^p = (V^p, A^p)$ le graphe. $w^p : A \rightarrow \bbR$ poids
+
+$A^p(j, t)$ : arcs $(t-1, l, a, i) \rightarrow (t, l', a', j),\, \forall a', a, i, l, l'$
+
+$u^p$ sommet de départ de la parcelle $p$ (état initial).
+
+On relie tous les sommets $t=T$ à $u^p$
+
+\begin{minie}|s|[2] % minie = minimize
+    {y , x}  % optimization variables
+    {\sum_{p\in \mathcal{P}}y_p} % objective function and label
+    {} % label for optimization problem
+    {} % optimization result
+    \addConstraint{y_p}{ = \sum_{v\in \delta^+(u^p)}x_{(u^p, v)}}{\forall p\in\mathcal{P}}
+    \addConstraint{\sum_{v\in \delta^-(u)} x_{v, u}^p}{ = \sum_{v\in \delta^+(u)} x_{u, v}^p}{\forall p\in \mathcal{P},\, \forall u\in V^p}
+    \addConstraint{\sum_{p\in\mathcal{P}}\sum_{(u, v)\in A^p(j, t)} w_{u, v} x_{(u, v)}^p}{\geq D_{j, t}\quad}{\forall t\in \llb 1, T \rrb,\, \forall j\in C}
+    \addConstraint{y_p}{\in \{0, 1\}}{\forall p\in \mathcal{P}}
+    \addConstraint{x_{(u, v)}^p}{\in \{0, 1\}}{\forall p\in \mathcal{P},\, \forall (u, v)\in A^p}
+\end{minie}
+
+\end{document}
