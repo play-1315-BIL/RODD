@@ -83,8 +83,6 @@ function graph_from_instance(instance::Instance)
                 push!(delta_plus[index1], index2)
                 push!(delta_moins[index2], index1)
                 adj[index1, index2] = 1
-            # else
-            #     println(sommet1, ", ", sommet2)
             end
         end
     end

@@ -16,25 +16,91 @@
 
 \maketitle
 
+\section{Construction du graphe}
 
-$G^p = (V^p, A^p)$ le graphe. $w^p : A \rightarrow \bbR$ poids
+\noindent Soit $p\in \mathcal{P}$. Définissons le graphe $G^p = (V^p, A^p)$ :
+\begin{arrowlist}
+    \item \textbf{Sommets} : $V^p = \{ (t, l, a, j)\in \llb 1, T \rrb \times \llb 1, l_{max} \rrb \times \llb 0, a_{max} \rrb \times (\mathcal{C} \cup \{0\}) | j=0 \implies a=0 \}\bigcup\, \{u^p\}$
+    $u^p = (0, l^p, 0, 0)$ état initial de la parcelle $p$.
+    \item \textbf{Arcs} : $A^p$ contient quatre types d'arcs différents, correspondant aux transitions entre les périodes $t\in \llb 1, T \rrb$ :
+    \begin{bulletlist}
+        \item jachère $\rightarrow$ jachère : $(t-1, l, 0, 0) \rightarrow (t, \min(l+1, l_{max}), 0, 0)$
+        \item culture $\rightarrow$ jachère : $(t-1, l, a, j) \rightarrow (t, 1, 0, 0)$
+        \item jachère $\rightarrow$ culture : $(t-1, l, 0, 0) \rightarrow (t, l, 1, j)$
+        \item culture $\rightarrow$ culture : $(t-1, l, a, j) \rightarrow (t, l, a+1, j')$
+    \end{bulletlist}
+    \item \textbf{Poids} : $w^p : A^p \rightarrow \bbR$, tel que : 
+    
+    $\forall(u, v)\in A^p,\, u = (t, l, a, j), v = (t', l', a', j'),\, \boxed{w^p_{u, v} = R_p(l, a', j, j')}$
+    \item Soient $j\in\mathcal{C}, t\in \llb 1, T\rrb$.
+    
+    On note $A^p(j, t)$ le sous-ensemble d'arcs de $A^p$ de la forme $(t-1, l, a, i) \rightarrow (t, l', a', j)$
+\end{arrowlist}
 
-$A^p(j, t)$ : arcs $(t-1, l, a, i) \rightarrow (t, l', a', j),\, \forall a', a, i, l, l'$
+\noindent Une rotation sur la parcelle $p$ correspond à un chemin dans $G^p$ de $u^p$ à un sommet de type $(T, l, a, j)$.
 
-$u^p$ sommet de départ de la parcelle $p$ (état initial).
+\section{Modélisation par un PLNE}
 
-On relie tous les sommets $t=T$ à $u^p$
+% On relie tous les sommets $t=T$ à $u^p$
+\noindent Considérons les graphes $G^p,\, p\in \mathcal{P}$ définis dans la section précédente. On peut modéliser le problème de planification sous la forme d'un programme linéaire en nombres entiers :
+\begin{arrowlist}
+    \item \textbf{Variables de décision} : $\forall p\in \mathcal{P},\, \forall (u, v)\in A^p,\, x_{u, v}^p = \1_{\{(u, v)\text{ est dans la rotation de la parcelle }p \}}$
+    \item \textbf{Objectif} : $\sum\limits_{p\in \mathcal{P}} \sum\limits_{v\in \delta^+(u^p)}x_{u^p, v}^p$
+    \item \textbf{Contraintes} :
+    \begin{bulletlist}
+        \item Demande satisfaite à chaque période pour chaque culture :
+        
+        $$\sum_{p\in\mathcal{P}}\sum_{(u, v)\in A^p(j, t)} w^p_{u, v} x_{u, v}^p \geq D_{j, t},\, \forall t\in \llb 1, T \rrb,\, \forall j\in C$$
+        \item Contraintes de type \textit{flot} le long des chemins/rotations :
+        
+        $$\sum_{v\in \delta^-(u)} x_{v, u}^p = \sum_{v\in \delta^+(u)} x_{u, v}^p,\, \forall p\in \mathcal{P},\, \forall u\in V^p$$
+        \item Au plus une rotation par parcelle :
+        
+        $$ \sum_{v\in \delta^+(u^p)}x_{u^p, v}^p \leq 1,\, \forall p\in \mathcal{P}$$
+    \end{bulletlist}
+\end{arrowlist}
 
+\noindent PLNE final :
 \begin{minie}|s|[2] % minie = minimize
-    {y , x}  % optimization variables
-    {\sum_{p\in \mathcal{P}}y_p} % objective function and label
+    {x}  % optimization variables
+    {\sum_{p\in \mathcal{P}} \sum_{v\in \delta^+(u^p)}x_{u^p, v}^p} % objective function and label
     {} % label for optimization problem
     {} % optimization result
-    \addConstraint{y_p}{ = \sum_{v\in \delta^+(u^p)}x_{(u^p, v)}}{\forall p\in\mathcal{P}}
     \addConstraint{\sum_{v\in \delta^-(u)} x_{v, u}^p}{ = \sum_{v\in \delta^+(u)} x_{u, v}^p}{\forall p\in \mathcal{P},\, \forall u\in V^p}
-    \addConstraint{\sum_{p\in\mathcal{P}}\sum_{(u, v)\in A^p(j, t)} w_{u, v} x_{(u, v)}^p}{\geq D_{j, t}\quad}{\forall t\in \llb 1, T \rrb,\, \forall j\in C}
-    \addConstraint{y_p}{\in \{0, 1\}}{\forall p\in \mathcal{P}}
-    \addConstraint{x_{(u, v)}^p}{\in \{0, 1\}}{\forall p\in \mathcal{P},\, \forall (u, v)\in A^p}
+    \addConstraint{\sum_{p\in\mathcal{P}}\sum_{(u, v)\in A^p(j, t)} w^p_{u, v} x_{u, v}^p}{\geq D_{j, t}\quad}{\forall t\in \llb 1, T \rrb,\, \forall j\in C}
+    \addConstraint{\sum_{v\in \delta^+(u^p)}x_{u^p, v}^p}{\leq 1}{\forall p\in \mathcal{P}}
+    \addConstraint{x_{u, v}^p}{\in \{0, 1\}}{\forall p\in \mathcal{P},\, \forall (u, v)\in A^p}
 \end{minie}
+
+\section{Résolution de l'instance}
+
+\noindent Nous avons implémenté le PLNE décrit dans la section précédente en \textsc{Julia} interfacé avec le solveur \textsc{CPLEX}, afin de résoudre l'instance de l'énoncé. On obtient le résultat suivant :
+\begin{bulletlist}
+    \item Nombres de noeuds développés dans l'arbre de recherche : $0$
+    \item Nombre de parcelle cultivées (i.e. valeur de l'objectif à l'optimum) : $\boxed{19}$
+\end{bulletlist}
+
+\section{Formulation \textit{étendue}}
+
+\noindent Notons $\mathcal{R}$ l'ensemble des rotations possibles. Soient $r\in \mathcal{R},\, j\in \mathcal{C},\, t\in \llb 1, T \rrb$. On note $r(j, t)$ l'ensemble des arcs de la rotation $r$
+
+\begin{minie}|s|[2] % minie = minimize
+    {x}  % optimization variables
+    {\sum_{r\in \mathcal{R}} x_r} % objective function and label
+    {} % label for optimization problem
+    {} % optimization result
+    \addConstraint{\sum_{r\in \mathcal{R}} \sum_{(u, v)\in r(j, t)} w_{u, v} x_r}{\geq D_{j, t}}{\forall j\in \mathcal{C},\, \forall t\in \llb 1, T \rrb}
+    \addConstraint{x_r}{\in \bbN}{\forall r\in \mathcal{R}}
+\end{minie}
+
+\todo[inline]{Que se passe-t-il si le rendement dépend de la parcelle $p$ considérée ? Peut-on écrire qqchose ?}
+
+\section{Approche de génération de colonnes}
+
+\todo[inline]{à rédiger}
+
+\noindent Sous-problème :
+
+$$\max_r \sum_{j\in \mathcal{C}}\sum_{t = 1}^T \left(\sum_{(u, v) \in r(j, t)} w_{u, v}\right) \mu_{j, t} $$
 
 \end{document}
