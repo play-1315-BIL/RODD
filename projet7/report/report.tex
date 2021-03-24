@@ -66,9 +66,9 @@
     {\sum_{p\in \mathcal{P}} \sum_{v\in \delta^+(u^p)}x_{u^p, v}^p} % objective function and label
     {} % label for optimization problem
     {} % optimization result
-    \addConstraint{\sum_{v\in \delta^-(u)} x_{v, u}^p}{ = \sum_{v\in \delta^+(u)} x_{u, v}^p}{\forall p\in \mathcal{P},\, \forall u\in V^p}
-    \addConstraint{\sum_{p\in\mathcal{P}}\sum_{(u, v)\in A^p(j, t)} w^p_{u, v} x_{u, v}^p}{\geq D_{j, t}\quad}{\forall t\in \llb 1, T \rrb,\, \forall j\in C}
+    \addConstraint{\sum_{v\in \delta^-(u)} x_{v, u}^p}{ = \sum_{v\in \delta^+(u)} x_{u, v}^p}{\forall p\in \mathcal{P},\, \forall u\in V^p\backslash\{u^p\}}
     \addConstraint{\sum_{v\in \delta^+(u^p)}x_{u^p, v}^p}{\leq 1}{\forall p\in \mathcal{P}}
+    \addConstraint{\sum_{p\in\mathcal{P}}\sum_{(u, v)\in A^p(j, t)} w^p_{u, v} x_{u, v}^p}{\geq D_{j, t}\quad}{\forall t\in \llb 1, T \rrb,\, \forall j\in C}
     \addConstraint{x_{u, v}^p}{\in \{0, 1\}}{\forall p\in \mathcal{P},\, \forall (u, v)\in A^p}
 \end{minie}
 
