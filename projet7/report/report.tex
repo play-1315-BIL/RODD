@@ -53,7 +53,7 @@
         $$\sum_{p\in\mathcal{P}}\sum_{(u, v)\in A^p(j, t)} w^p_{u, v} x_{u, v}^p \geq D_{j, t},\, \forall t\in \llb 1, T \rrb,\, \forall j\in C$$
         \item Contraintes de type \textit{flot} le long des chemins/rotations :
         
-        $$\sum_{v\in \delta^-(u)} x_{v, u}^p = \sum_{v\in \delta^+(u)} x_{u, v}^p,\, \forall p\in \mathcal{P},\, \forall u\in V^p$$
+        $$\sum_{v\in \delta^-(u)} x_{v, u}^p = \sum_{v\in \delta^+(u)} x_{u, v}^p,\, \forall p\in \mathcal{P},\, \forall u\in V^p\backslash\{u^p\}$$
         \item Au plus une rotation par parcelle :
         
         $$ \sum_{v\in \delta^+(u^p)}x_{u^p, v}^p \leq 1,\, \forall p\in \mathcal{P}$$
@@ -77,30 +77,44 @@
 \noindent Nous avons implémenté le PLNE décrit dans la section précédente en \textsc{Julia} interfacé avec le solveur \textsc{CPLEX}, afin de résoudre l'instance de l'énoncé. On obtient le résultat suivant :
 \begin{bulletlist}
     \item Nombres de noeuds développés dans l'arbre de recherche : $0$
+    \item Temps de calcul : $0.42$ s
     \item Nombre de parcelle cultivées (i.e. valeur de l'objectif à l'optimum) : $\boxed{19}$
 \end{bulletlist}
 
 \section{Formulation \textit{étendue}}
 
-\noindent Notons $\mathcal{R}$ l'ensemble des rotations possibles. Soient $r\in \mathcal{R},\, j\in \mathcal{C},\, t\in \llb 1, T \rrb$. On note $r(j, t)$ l'ensemble des arcs de la rotation $r$
+\noindent Dans cette section on considère que les parcelles sont identiques, i.e. les rendements sont identiques (i.e. $\forall  p\in\mathcal{P},\, R_p = R$). Notons $\mathcal{R}$ l'ensemble des rotations possibles. On a la formulation \textit{étendue} suivante :
 
 \begin{minie}|s|[2] % minie = minimize
     {x}  % optimization variables
     {\sum_{r\in \mathcal{R}} x_r} % objective function and label
     {} % label for optimization problem
     {} % optimization result
-    \addConstraint{\sum_{r\in \mathcal{R}} \sum_{(u, v)\in r(j, t)} w_{u, v} x_r}{\geq D_{j, t}}{\forall j\in \mathcal{C},\, \forall t\in \llb 1, T \rrb}
+    \addConstraint{\sum_{r\in \mathcal{R}} \sum_{(u, v)\in r} \1_{\{ v = (t, \cdot, \cdot, j)\}} w_{u, v} x_r}{\geq D_{j, t}\quad }{\forall j\in \mathcal{C},\, \forall t\in \llb 1, T \rrb}\label{demand-eq}
     \addConstraint{x_r}{\in \bbN}{\forall r\in \mathcal{R}}
 \end{minie}
 
-\todo[inline]{Que se passe-t-il si le rendement dépend de la parcelle $p$ considérée ? Peut-on écrire qqchose ?}
-
 \section{Approche de génération de colonnes}
 
-\todo[inline]{à rédiger}
+\noindent A partir de la formulation \textit{étendue} présentée dans la section précédente, on considère une approche de type génération de colonne afin de calculer sa relaxation continue, et donc une borne inférieure de l'optimum. Afin d'identifier la variable à ajouter à chaque itération, on cherche la variable associée à la contrainte la plus violée dans le dual. On note $\mu_{j, t}\geq 0$ les variables duales associées aux contraintes (\ref{demand-eq}). Voici l'expression du dual :
 
-\noindent Sous-problème :
+\begin{maxie}|s|[2] % maxie = minimize
+    {x}  % optimization variables
+    {\sum_{j\in\mathcal{C}}\sum_{t=1}^T D_{j, t}\mu_{j, t}} % objective function and label
+    {} % label for optimization problem
+    {} % optimization result
+    \addConstraint{\sum_{(u, v)\in r} w_{u, v} \left(\sum_{j\in\mathcal{C}}\sum_{t=1}^T \1_{\{ v = (t, \cdot, \cdot, j)\}} \mu_{j, t}\right)}{\leq 1\quad}{\forall r\in \mathcal{R}}
+    \addConstraint{\mu_{j, t}}{\geq 0}{\forall j\in \mathcal{C},\, t\in\llb 1, T \rrb}
+\end{maxie}
 
-$$\max_r \sum_{j\in \mathcal{C}}\sum_{t = 1}^T \left(\sum_{(u, v) \in r(j, t)} w_{u, v}\right) \mu_{j, t} $$
+\noindent On en déduit le sous-problème ($\mu$ est fixé) :
+
+$$\max_{r\in\mathcal{R}} \sum_{(u, v) \in r} w_{u, v} \left(\sum_{j\in \mathcal{C}}\sum_{t = 1}^T  \1_{\{ v = (t, \cdot, \cdot, j)\}}  \mu_{j, t}\right) $$
+
+\noindent Pour chaque arc, la somme d'indicatrices contenant un seul terme non nul, on peut écrire :
+
+$$\max_{r\in \mathcal{R}} \sum_{(u, v) \in r} w_{u, v} \mu_{j_v, t_v}$$
+
+\noindent Cela revient à calculer un plus long chemin dans le graphe $G^p$ depuis le sommet $u^p$, en pondérant chaque arc $(u, v)$ par $w_{u, v}\mu_{j_v, t_v}$.
 
 \end{document}

@@ -37,12 +37,12 @@ end
 
 function solve_model!(model::Model, x::Any)
     optimize!(model)
-    return objective_value(model), value.(x)
+    return objective_value(model), value.(x), node_count(model), solve_time(model)
 end
 
 
 function plne(instance::Instance)
     model, x = generate_model(instance)
-    objective, x = solve_model!(model, x)
-    return objective, x
+    objective, x, nodes, time = solve_model!(model, x)
+    return objective, x, nodes, time
 end
